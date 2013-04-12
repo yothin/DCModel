@@ -8,12 +8,25 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
+#import <CoreData/CoreData.h>
 
-@class DCModel;
+//@class DCModel;
 
-typedef void (^DCModelBlock)(NSArray* items);
+typedef void (^DCModelBlock)(id items);
 
-@interface DCModel : NSObject
+@interface NSManagedObject (ActiveRecord)
+
+//deletes the current object from coreData
+-(void)destroy;
+
+//this just runs the class save method
+-(void)save;
+
+//checks on disk if object already exist
+- (BOOL)isDuplicate:(Class)class;
+
+//override and set one of your properties to be a primary key (if needed) 
++(NSString*)primaryKey;
 
 //fetches an object show route from the network.(e.g. /user/1.json)
 +(void)get:(NSString*)url finished:(DCModelBlock)callback;
@@ -28,12 +41,33 @@ typedef void (^DCModelBlock)(NSArray* items);
 +(void)all:(DCModelBlock)callback;
 
 //find an object of this table from coreData
-+(void)find:(NSPredicate*)predicate sort:(NSArray*)sortDescriptors finished:(DCModelBlock)callback;
++(void)where:(id)search sort:(NSArray*)sortDescriptors finished:(DCModelBlock)callback;
+
+//find an object of this table from coreData
++(void)where:(id)search finished:(DCModelBlock)callback;
 
 //does a batch save of all the objects.
 +(void)saveObjects:(NSArray*)objects;
 
-//unrecommend sync methods
+//saves an object
++(void)saveObject:(NSManagedObject*)object;
+
+//delete an object
++(void)destroyObject:(NSManagedObject*)object;
+
+//delete a group of objects
++(void)destroyObjects:(NSArray*)objects;
+
+//creates a new object and saves it to disk
++(id)create:(NSDictionary*)dict;
+
+//creates a new object, but does NOT save it disk. You need to save it manually.
++(id)newObject;
+
+//creates a new object, but does NOT save it disk. You need to save it manually.
++(id)newObject:(NSDictionary*)dict;
+
+//unrecommend sync methods. These are NOT thread safe.
 
 //fetches an object show route from the network.(e.g. /user/1.json)
 +(id)get:(NSString*)url;
@@ -48,10 +82,19 @@ typedef void (^DCModelBlock)(NSArray* items);
 +(NSArray*)allSorted:(NSArray*)sortDescriptors;
 
 //find an object of this table from coreData
-+(NSArray*)find:(NSPredicate*)predicate sort:(NSArray*)sortDescriptors;
++(NSArray*)where:(id)search sort:(NSArray*)sortDescriptors;
 
++(NSArray*)where:(id)search;
 
-//use to clear a all contents of a DB from disk.
+//returns the entityName of the coreData entity. By Default it returns the className.
+//override this in your subclass if you have a different name.
++(NSString*)entityName;
+
+//use to clear a all contents of a DB from disk. 
 +(void)clearDiskStorage;
 
+//I am exposing this, so incase you need to use it your subclass.
++(NSData*)fetchNetworkContent:(NSString*)url;
+
 @end
+
