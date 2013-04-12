@@ -95,6 +95,7 @@ typedef void (^DCModelBlock)(id items);
 
 //I am exposing this, so incase you need to use it your subclass.
 +(NSData*)fetchNetworkContent:(NSString*)url;
++(id)createJSONObject:(NSData*)data;
 
 @end
 
