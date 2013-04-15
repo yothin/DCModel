@@ -30,7 +30,7 @@ typedef void (^DiskCallBack)(void);
 +(id)newObject:(NSDictionary*)dict
 {
     NSEntityDescription *entity = [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self objectCtx]];
-    id managedObject = [[NSManagedObject alloc] initWithEntity:entity insertIntoManagedObjectContext:nil];
+    id managedObject = [[[self class] alloc] initWithEntity:entity insertIntoManagedObjectContext:nil]; //NSManagedObject
     //id managedObject = [NSEntityDescription insertNewObjectForEntityForName:[self entityName] inManagedObjectContext:nil];
     for(NSString* key in dict)
     {
@@ -361,7 +361,7 @@ typedef void (^DiskCallBack)(void);
             if(i < count)
                 [queryString appendString:@" AND "];
         }
-        return [NSPredicate predicateWithFormat:search];;
+        return [NSPredicate predicateWithFormat:search];
     }
     
     return nil;
