@@ -41,6 +41,9 @@ typedef void (^DCModelBlock)(id items);
 +(void)all:(DCModelBlock)callback;
 
 //find an object of this table from coreData
++(void)where:(id)search sort:(NSArray*)sortDescriptors limit:(NSInteger)limit finished:(DCModelBlock)callback;
+
+//find an object of this table from coreData
 +(void)where:(id)search sort:(NSArray*)sortDescriptors finished:(DCModelBlock)callback;
 
 //find an object of this table from coreData
@@ -85,6 +88,8 @@ typedef void (^DCModelBlock)(id items);
 +(NSArray*)where:(id)search sort:(NSArray*)sortDescriptors;
 
 +(NSArray*)where:(id)search;
+
++(NSArray*)where:(id)search sort:(NSArray*)sortDescriptors limit:(NSInteger)limit;
 
 //returns the entityName of the coreData entity. By Default it returns the className.
 //override this in your subclass if you have a different name.

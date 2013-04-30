@@ -92,18 +92,21 @@ typedef void (^DiskCallBack)(void);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)all:(DCModelBlock)callback
 {
-    [self where:nil sort:nil finished:callback];
+    [self where:nil sort:nil limit:0 finished:callback];
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)where:(id)search finished:(DCModelBlock)callback
 {
-    [self where:search sort:nil finished:callback];
+    [self where:search sort:nil limit:0 finished:callback];
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)where:(id)search sort:(NSArray*)sortDescriptors finished:(DCModelBlock)callback
 {
+}
++(void)where:(id)search sort:(NSArray*)sortDescriptors limit:(NSInteger)limit finished:(DCModelBlock)callback
+{
     [self addDiskOperation:^{
-        NSArray* items = [self where:search sort:sortDescriptors];
+        NSArray* items = [self where:search sort:sortDescriptors limit:limit];
         callback(items);
     }];
 }
@@ -205,15 +208,20 @@ typedef void (^DiskCallBack)(void);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 +(NSArray*)allSorted:(NSArray*)sortDescriptors
 {
-    return [self where:nil sort:sortDescriptors];
+    return [self where:nil sort:sortDescriptors limit:0];
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 +(NSArray*)where:(id)search
 {
-    return [self where:search sort:nil];
+    return [self where:search sort:nil limit:0];
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-+(NSArray*)where:(id)search sort:(NSArray*)sortDescriptors
++(NSArray*)where:(id)search sort:(NSArray*)sortDescriptors 
+{
+    return [self where:search sort:nil limit:0];
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
++(NSArray*)where:(id)search sort:(NSArray*)sortDescriptors limit:(NSInteger)limit
 {
     NSEntityDescription *entity = [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self objectCtx]];
     NSFetchRequest *request = [[NSFetchRequest alloc] init];
@@ -221,6 +229,8 @@ typedef void (^DiskCallBack)(void);
     
     [request setSortDescriptors:sortDescriptors];
     request.predicate = [self processSearch:search];
+    if(limit > 0)
+        [request setFetchLimit:limit];
     return [[self objectCtx] executeFetchRequest:request error:nil];
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
