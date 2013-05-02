@@ -52,15 +52,15 @@ typedef void (^DiskCallBack)(void);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 -(BOOL)isDuplicate:(Class)class
 {
-    BOOL canSave = YES;
+    BOOL isDup = NO;
     NSString* key = [class primaryKey];
     if(key)
     {
-        NSArray* items = [class where:[NSString stringWithFormat:@"%@ == '%@'",key,[self valueForKey:key]]];
+        NSArray* items = [class where:[NSString stringWithFormat:@"%@ == '%@'",key,[self valueForKey:key]] sort:nil limit:1];
         if(items.count > 0)
-            canSave = NO;
+            isDup = YES;
     }
-    return canSave;
+    return isDup;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 +(NSString*)primaryKey
@@ -116,7 +116,7 @@ typedef void (^DiskCallBack)(void);
     [self addDiskOperation:^{
         for(NSManagedObject* object in objects)
         {
-            if([object isDuplicate:[self class]])
+            if(![object isDuplicate:[object class]])
                 [[self objectCtx] insertObject:object];
         }
         [[self objectCtx] save:nil];
@@ -126,7 +126,7 @@ typedef void (^DiskCallBack)(void);
 +(void)saveObject:(NSManagedObject*)object
 {
     [self addDiskOperation:^{
-        if([object isDuplicate:[self class]])
+        if(![object isDuplicate:[object class]])
             [[self objectCtx] insertObject:object];
         [[self objectCtx] save:nil];
     }];
