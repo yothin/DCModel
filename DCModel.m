@@ -109,7 +109,9 @@ typedef void (^DiskCallBack)(void);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)where:(id)search sort:(NSArray*)sortDescriptors finished:(DCModelBlock)callback
 {
+    [self where:search sort:sortDescriptors limit:0 finished:callback];
 }
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)where:(id)search sort:(NSArray*)sortDescriptors limit:(NSInteger)limit finished:(DCModelBlock)callback
 {
     [self addDiskOperation:^{
@@ -380,7 +382,7 @@ typedef void (^DiskCallBack)(void);
         int count = [search count];
         for(id key in search)
         {
-            [queryString appendFormat:@"%@ == '%@'", key, [search valueForKey:key]];
+            [queryString appendFormat:@"%@ == %@", key, [search valueForKey:key]];
             i++;
             if(i < count)
                 [queryString appendString:@" AND "];
