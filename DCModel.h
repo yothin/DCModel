@@ -34,6 +34,9 @@ typedef void (^DCModelBlock)(id items);
 //fetches an object index route from the network.(e.g. /users.json)
 +(void)getAll:(NSString*)url finished:(DCModelBlock)callback;
 
+//fetches an raw json and returns it from the network.
++(void)getRaw:(NSString*)url finished:(DCModelBlock)callback;
+
 //pulls all the objects of this table from the coreData. Pass a sort Descriptor if you want them sorted
 +(void)all:(NSArray*)sortDescriptors finished:(DCModelBlock)callback;
 
@@ -77,6 +80,9 @@ typedef void (^DCModelBlock)(id items);
 
 //fetches an object index route from the network.(e.g. /users.json)
 +(NSArray*)getAll:(NSString*)url;
+
+//fetches an raw json and returns it from the network.
++(id)getRaw:(NSString*)url;
 
 //pulls all the objects of this table from the coreData
 +(NSArray*)all;
