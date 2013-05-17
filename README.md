@@ -45,9 +45,9 @@ The CoreData frame work is required.
 Requires at least iOS 5/OSX 10.7 or above. Also required is: https://github.com/daltoniam/GPHTTPRequest. 
 JSONKit will also be used if it is included in your app.
 
-# install #
+# Install #
 
-The recommended approach for installing DCMOdel is via the CocoaPods package manager, as it provides flexible dependency management and dead simple installation.
+The recommended approach for installing DCModel is via the CocoaPods package manager, as it provides flexible dependency management and dead simple installation.
 
 via CocoaPods
 
