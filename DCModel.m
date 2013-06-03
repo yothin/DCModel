@@ -60,6 +60,8 @@ typedef void (^DiskCallBack)(void);
         if(items.count > 0)
             isDup = YES;
     }
+    if([self managedObjectContext])
+        return YES;
     return isDup;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
