@@ -14,6 +14,8 @@
 
 typedef void (^DCModelBlock)(id items);
 
+typedef id (^DCModelParseBlock)(id jsonObj);
+
 @interface NSManagedObject (ActiveRecord)
 
 //deletes the current object from coreData
@@ -35,7 +37,7 @@ typedef void (^DCModelBlock)(id items);
 +(void)getAll:(NSString*)url finished:(DCModelBlock)callback;
 
 //fetches an raw json and returns it from the network.
-+(void)getRaw:(NSString*)url finished:(DCModelBlock)callback;
++(void)getRaw:(NSString*)url parse:(DCModelParseBlock)parseBlock finished:(DCModelBlock)callback;
 
 //pulls all the objects of this table from the coreData. Pass a sort Descriptor if you want them sorted
 +(void)all:(NSArray*)sortDescriptors finished:(DCModelBlock)callback;

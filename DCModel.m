@@ -76,21 +76,30 @@ typedef void (^DiskCallBack)(void);
 +(void)get:(NSString*)url finished:(DCModelBlock)callback
 {
     dispatch_async(dispatch_get_global_queue(0, 0),^ {
-        callback([self get:url]);
+        id obj = [self get:url];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            callback(obj);
+        });
     });
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)getAll:(NSString*)url finished:(DCModelBlock)callback
 {
     dispatch_async(dispatch_get_global_queue(0, 0),^ {
-        callback([self getAll:url]);
+        NSArray* items = [self getAll:url];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            callback(items);
+        });
     });
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-+(void)getRaw:(NSString*)url finished:(DCModelBlock)callback
++(void)getRaw:(NSString*)url parse:(DCModelParseBlock)parseBlock finished:(DCModelBlock)callback
 {
     dispatch_async(dispatch_get_global_queue(0, 0),^ {
-        callback([self getRaw:url]);
+        id obj = parseBlock([self getRaw:url]);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            callback(obj);
+        });
     });
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -118,7 +127,9 @@ typedef void (^DiskCallBack)(void);
 {
     [self addDiskOperation:^{
         NSArray* items = [self where:search sort:sortDescriptors limit:limit];
-        callback(items);
+        dispatch_async(dispatch_get_main_queue(), ^{
+            callback(items);
+        });
     }];
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
