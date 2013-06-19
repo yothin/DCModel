@@ -147,28 +147,37 @@ typedef void (^DiskCallBack)(void);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)saveObject:(NSManagedObject*)object
 {
-    [self addDiskOperation:^{
-        if(![object isDuplicate:[object class]])
-            [[self objectCtx] insertObject:object];
-        [[self objectCtx] save:nil];
-    }];
+    if(object)
+    {
+        [self addDiskOperation:^{
+            if(![object isDuplicate:[object class]])
+                [[self objectCtx] insertObject:object];
+            [[self objectCtx] save:nil];
+        }];
+    }
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)destroyObject:(NSManagedObject*)object
 {
-    [NSManagedObject addDiskOperation:^{
-        [[self objectCtx] deleteObject:object];
-        [[self objectCtx] save:nil];
-    }];
+    if(object)
+    {
+        [NSManagedObject addDiskOperation:^{
+            [[self objectCtx] deleteObject:object];
+            [[self objectCtx] save:nil];
+        }];
+    }
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)destroyObjects:(NSArray*)objects
 {
-    [self addDiskOperation:^{
-        for(NSManagedObject* object in objects)
-            [[self objectCtx] deleteObject:object];
-        [[self objectCtx] save:nil];
-    }];
+    if(objects)
+    {
+        [self addDiskOperation:^{
+            for(NSManagedObject* object in objects)
+                [[self objectCtx] deleteObject:object];
+            [[self objectCtx] save:nil];
+        }];
+    }
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 +(id)create:(NSDictionary*)dict
