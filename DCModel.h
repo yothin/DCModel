@@ -106,6 +106,9 @@ typedef id (^DCModelParseBlock)(id jsonObj);
 //use to clear a all contents of a DB from disk. 
 +(void)clearDiskStorage;
 
+//use this to stop all async DB operations
++(void)stopOperations;
+
 //I am exposing this, so incase you need to use it your subclass.
 +(NSData*)fetchNetworkContent:(NSString*)url;
 +(id)createJSONObject:(NSData*)data;
