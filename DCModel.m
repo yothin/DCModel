@@ -174,7 +174,15 @@ typedef void (^DiskCallBack)(void);
     {
         [self addDiskOperation:^{
             for(NSManagedObject* object in objects)
-                [[self objectCtx] deleteObject:object];
+            {
+                if([object isKindOfClass:[NSManagedObject class]])
+                {
+                    if(![object managedObjectContext])
+                        [[self objectCtx] insertObject:object];
+                    if([self objectCtx] == [object managedObjectContext])
+                        [[self objectCtx] deleteObject:object];
+                }
+            }
             [[self objectCtx] save:nil];
         }];
     }
