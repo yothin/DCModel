@@ -25,7 +25,7 @@ typedef id (^DCModelParseBlock)(id jsonObj);
 -(void)save;
 
 //checks on disk if object already exist
-- (BOOL)isDuplicate:(Class)class;
+- (BOOL)isDuplicate:(Class)classVar;
 
 //override and set one of your properties to be a primary key (if needed) 
 +(NSString*)primaryKey;
