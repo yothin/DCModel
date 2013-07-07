@@ -138,7 +138,7 @@ typedef void (^DiskCallBack)(void);
     [self addDiskOperation:^{
         for(NSManagedObject* object in objects)
         {
-            if(![object isDuplicate:[object class]])
+            if(![object isDuplicate:[object class]] && [object isKindOfClass:[NSManagedObject class]])
                 [[self objectCtx] insertObject:object];
         }
         [[self objectCtx] save:nil];
@@ -147,7 +147,7 @@ typedef void (^DiskCallBack)(void);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)saveObject:(NSManagedObject*)object
 {
-    if(object)
+    if(object && [object isKindOfClass:[NSManagedObject class]])
     {
         [self addDiskOperation:^{
             if(![object isDuplicate:[object class]])
