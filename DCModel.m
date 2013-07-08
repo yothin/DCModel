@@ -280,6 +280,25 @@ typedef void (^DiskCallBack)(void);
     return [[self objectCtx] executeFetchRequest:request error:nil];
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
++(BOOL)syncDeleteObjects:(NSArray*)objects
+{
+    if(objects)
+    {
+        for(NSManagedObject* object in objects)
+        {
+            if([object isKindOfClass:[NSManagedObject class]])
+            {
+                if(![object managedObjectContext])
+                    [[self objectCtx] insertObject:object];
+                if([self objectCtx] == [object managedObjectContext])
+                    [[self objectCtx] deleteObject:object];
+            }
+        }
+        return [[self objectCtx] save:nil];
+    }
+    return NO;
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //public methods
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)clearDiskStorage

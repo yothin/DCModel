@@ -99,6 +99,9 @@ typedef id (^DCModelParseBlock)(id jsonObj);
 
 +(NSArray*)where:(id)search sort:(NSArray*)sortDescriptors limit:(NSInteger)limit;
 
+//destorys the objects in the array
++(BOOL)syncDeleteObjects:(NSArray*)objects;
+
 //returns the entityName of the coreData entity. By Default it returns the className.
 //override this in your subclass if you have a different name.
 +(NSString*)entityName;
