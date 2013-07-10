@@ -112,6 +112,9 @@ typedef id (^DCModelParseBlock)(id jsonObj);
 //use this to stop all async DB operations
 +(void)stopOperations;
 
+//block the current thread until all opts complete
++(void)wait;
+
 //I am exposing this, so incase you need to use it your subclass.
 +(NSData*)fetchNetworkContent:(NSString*)url;
 +(id)createJSONObject:(NSData*)data;
