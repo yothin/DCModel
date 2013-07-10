@@ -141,7 +141,9 @@ typedef void (^DiskCallBack)(void);
             if(![object isDuplicate:[object class]] && [object isKindOfClass:[NSManagedObject class]])
                 [[self objectCtx] insertObject:object];
         }
-        [[self objectCtx] save:nil];
+        NSError* error = nil;
+        if(![[self objectCtx] save:&error]){}
+            //NSLog(@"DCModel, error saving objects: %@ error: %@",objects,[error localizedDescription]);
     }];
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -152,7 +154,9 @@ typedef void (^DiskCallBack)(void);
         [self addDiskOperation:^{
             if(![object isDuplicate:[object class]])
                 [[self objectCtx] insertObject:object];
-            [[self objectCtx] save:nil];
+            NSError* error = nil;
+            if(![[self objectCtx] save:&error]){}
+                //NSLog(@"DCModel, error saving object: %@ error: %@",object,[error localizedDescription]);
         }];
     }
 }
