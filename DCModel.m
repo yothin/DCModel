@@ -77,7 +77,7 @@ typedef void (^DiskCallBack)(void);
 {
     dispatch_async(dispatch_get_global_queue(0, 0),^ {
         id obj = [self get:url];
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_sync(dispatch_get_main_queue(), ^{ //dispatch_async
             callback(obj);
         });
     });
@@ -87,7 +87,7 @@ typedef void (^DiskCallBack)(void);
 {
     dispatch_async(dispatch_get_global_queue(0, 0),^ {
         NSArray* items = [self getAll:url];
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_sync(dispatch_get_main_queue(), ^{
             callback(items);
         });
     });
@@ -97,7 +97,7 @@ typedef void (^DiskCallBack)(void);
 {
     dispatch_async(dispatch_get_global_queue(0, 0),^ {
         id obj = parseBlock([self getRaw:url]);
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_sync(dispatch_get_main_queue(), ^{
             callback(obj);
         });
     });
@@ -127,7 +127,7 @@ typedef void (^DiskCallBack)(void);
 {
     [self addDiskOperation:^{
         NSArray* items = [self where:search sort:sortDescriptors limit:limit];
-        dispatch_async(dispatch_get_main_queue(), ^{
+        dispatch_sync(dispatch_get_main_queue(), ^{
             callback(items);
         });
     }];
