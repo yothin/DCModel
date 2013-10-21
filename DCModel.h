@@ -30,15 +30,6 @@ typedef id (^DCModelParseBlock)(id jsonObj);
 //override and set one of your properties to be a primary key (if needed) 
 +(NSString*)primaryKey;
 
-//fetches an object show route from the network.(e.g. /user/1.json)
-+(void)get:(NSString*)url finished:(DCModelBlock)callback;
-
-//fetches an object index route from the network.(e.g. /users.json)
-+(void)getAll:(NSString*)url finished:(DCModelBlock)callback;
-
-//fetches an raw json and returns it from the network.
-+(void)getRaw:(NSString*)url parse:(DCModelParseBlock)parseBlock finished:(DCModelBlock)callback;
-
 //pulls all the objects of this table from the coreData. Pass a sort Descriptor if you want them sorted
 +(void)all:(NSArray*)sortDescriptors finished:(DCModelBlock)callback;
 
@@ -77,15 +68,6 @@ typedef id (^DCModelParseBlock)(id jsonObj);
 
 //unrecommend sync methods. These are NOT thread safe.
 
-//fetches an object show route from the network.(e.g. /user/1.json)
-+(id)get:(NSString*)url;
-
-//fetches an object index route from the network.(e.g. /users.json)
-+(NSArray*)getAll:(NSString*)url;
-
-//fetches an raw json and returns it from the network.
-+(id)getRaw:(NSString*)url;
-
 //pulls all the objects of this table from the coreData
 +(NSArray*)all;
 
@@ -114,10 +96,6 @@ typedef id (^DCModelParseBlock)(id jsonObj);
 
 //block the current thread until all opts complete
 +(void)wait;
-
-//I am exposing this, so incase you need to use it your subclass.
-+(NSData*)fetchNetworkContent:(NSString*)url;
-+(id)createJSONObject:(NSData*)data;
 
 @end
 

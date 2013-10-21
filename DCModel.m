@@ -8,7 +8,6 @@
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #import "DCModel.h"
-#import "GPHTTPRequest.h"
 #import <objc/runtime.h>
 
 @implementation NSManagedObject (ActiveRecord)
@@ -72,36 +71,6 @@ typedef void (^DiskCallBack)(void);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //recommend async methods
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-+(void)get:(NSString*)url finished:(DCModelBlock)callback
-{
-    dispatch_async(dispatch_get_global_queue(0, 0),^ {
-        id obj = [self get:url];
-        dispatch_sync(dispatch_get_main_queue(), ^{ //dispatch_async
-            callback(obj);
-        });
-    });
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-+(void)getAll:(NSString*)url finished:(DCModelBlock)callback
-{
-    dispatch_async(dispatch_get_global_queue(0, 0),^ {
-        NSArray* items = [self getAll:url];
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            callback(items);
-        });
-    });
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-+(void)getRaw:(NSString*)url parse:(DCModelParseBlock)parseBlock finished:(DCModelBlock)callback
-{
-    dispatch_async(dispatch_get_global_queue(0, 0),^ {
-        id obj = parseBlock([self getRaw:url]);
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            callback(obj);
-        });
-    });
-}
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)all:(NSArray*)sortDescriptors finished:(DCModelBlock)callback
 {
@@ -201,56 +170,6 @@ typedef void (^DiskCallBack)(void);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //unrecommend sync methods
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-+(id)get:(NSString*)url
-{
-    NSData* response = [self fetchNetworkContent:url];
-    id entries = [self createJSONObject:response];
-    if(!entries)
-        return nil;
-    if([entries isKindOfClass:[NSDictionary class]])
-    {
-        NSManagedObject* object = [self newObject];
-        [self processDict:entries object:object];
-        return object;
-    }
-    return nil;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-+(NSArray*)getAll:(NSString*)url
-{
-    NSData* response = [self fetchNetworkContent:url];
-    id entries = [self createJSONObject:response];
-    if(!entries)
-        return nil;
-    if([entries isKindOfClass:[NSDictionary class]])
-    {
-        if([entries count] == 1)
-        {
-            for(id key in entries)
-                entries = [entries objectForKey:key];
-        }
-    }
-    else if([entries isKindOfClass:[NSArray class]])
-    {
-        NSMutableArray* gather = [NSMutableArray arrayWithCapacity:[entries count]];
-        for(NSDictionary* entry in entries)
-        {
-            NSManagedObject* object = [self newObject];
-            [self processDict:entry object:object];
-            [gather addObject:object];
-        }
-        return gather;
-    }
-    return nil;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-+(id)getRaw:(NSString*)url
-{
-    NSData* response = [self fetchNetworkContent:url];
-    id entries = [self createJSONObject:response];
-    return entries;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 +(NSArray*)all
 {
     return [self where:nil sort:nil];
@@ -324,15 +243,6 @@ typedef void (^DiskCallBack)(void);
 +(NSString*)entityName
 {
     return [self getClassName:[self class]];
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-+(NSData*)fetchNetworkContent:(NSString*)url
-{
-    GPHTTPRequest *request = [GPHTTPRequest requestWithString:url];
-    [request setCacheTimeout:15];
-    [request setCacheModel:GPHTTPCacheCustomTime];
-    [request startSync];
-    return [request responseData];
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //local public methods
