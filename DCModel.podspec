@@ -11,5 +11,4 @@ Pod::Spec.new do |s|
   s.source_files = '*.{h,m}'
   s.framework  = 'CoreData'
   s.requires_arc = true
-  s.dependency  'GPHTTPRequest'
 end
