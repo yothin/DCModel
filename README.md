@@ -42,8 +42,6 @@ Done. Now anytime you save an object, it will validate to ensure that the object
 # Requirements/Dependencies  #
 
 The CoreData frame work is required.
-Requires at least iOS 5/OSX 10.7 or above. Also required is: https://github.com/daltoniam/GPHTTPRequest. 
-JSONKit will also be used if it is included in your app.
 
 # Install #
 
