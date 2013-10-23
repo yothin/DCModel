@@ -53,7 +53,7 @@ Install CocoaPods if not already available:
 
 	$ [sudo] gem install cocoapods
 	$ pod setup
-Change to the directory of your Xcode project, and Create and Edit your Podfile and add RestKit:
+Change to the directory of your Xcode project, and Create and Edit your Podfile and add DCModel:
 
 	$ cd /path/to/MyProject
 	$ touch Podfile

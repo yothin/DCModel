@@ -361,16 +361,6 @@ typedef void (^DiskCallBack)(void);
     return nil;
 }
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-+(id)createJSONObject:(NSData*)data
-{
-    id entries = nil;
-    if([data respondsToSelector:@selector(objectFromJSONData)])
-        entries = [data performSelector:@selector(objectFromJSONData)];
-    else
-        entries = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-    return entries;
-}
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)processDict:(NSDictionary*)entry object:(id)object
 {
     for(NSString* key in entry)
