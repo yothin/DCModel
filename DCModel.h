@@ -1,100 +1,211 @@
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
 //
 //  DCModel.h
 //
 //  Created by Dalton Cherry on 4/11/13.
-//  Copyright 2013 Basement Krew. All rights reserved.
 //
-///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//  Overall I believe a more efficent way to handle this would be to use SQLLite directly.
+//  This would require quite a bit more time investment, so I am going to this to get as close as we can.
+//  With that said, this framework is designed to be completely functional and never touch the main thread with coreData queries.
+//  So you should not have problem with coreData threading safety or blocking, pretty handy stuff.
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
 #import <Foundation/Foundation.h>
 #import <CoreData/CoreData.h>
 
-//@class DCModel;
-
 typedef void (^DCModelBlock)(id items);
+
+typedef void (^DCModelFailureBlock)(NSError* error);
+
+typedef void (^DCModelFailDestroy)(void);
 
 typedef id (^DCModelParseBlock)(id jsonObj);
 
 @interface NSManagedObject (ActiveRecord)
 
-//deletes the current object from coreData
--(void)destroy;
+///-------------------------------
+/// @name Instance Methods
+///-------------------------------
 
-//this just runs the class save method
--(void)save;
+/**
+ Runs the class method DestoryObject with self as the object
+ The success block is called once coreData is finished processing.
+ The failure block is called if an error is encountered.
+ */
+-(void)destroy:(DCModelFailDestroy)success failure:(DCModelFailureBlock)failure;
 
-//checks on disk if object already exist
-- (BOOL)isDuplicate:(Class)classVar;
+/**
+ Runs the class method save with self as the object
+ The success block is called once coreData is finished processing.
+ The failure block is called if an error is encountered.
+ */
+-(void)save:(DCModelBlock)success failure:(DCModelFailureBlock)failure;
 
-//override and set one of your properties to be a primary key (if needed) 
+/**
+ Runs the class method saveOrUpdate with self as the object
+ The success block is called once coreData is finished processing.
+ The failure block is called if an error is encountered.
+ */
+-(void)saveOrUpdate:(DCModelBlock)success failure:(DCModelFailureBlock)failure;
+
+///-------------------------------
+/// @name Asynchronous and Thread Safe Methods
+///-------------------------------
+
+/**
+ This validates the NSManagedObject against each other. This works by querying on this key for objects that match this value.
+ By default this is "objID".
+ */
 +(NSString*)primaryKey;
 
-//pulls all the objects of this table from the coreData. Pass a sort Descriptor if you want them sorted
-+(void)all:(NSArray*)sortDescriptors finished:(DCModelBlock)callback;
+/**
+ Fetchs all the objects of this table from the coreData. Pass a sort Descriptor if you want them sorted
+ The success block is called once coreData is finished processing.
+ */
++(void)all:(NSArray*)sortDescriptors success:(DCModelBlock)success;
 
-//pulls all the objects of this table from the coreData
-+(void)all:(DCModelBlock)callback;
+/**
+ Fetchs all the objects of this table from the coreData.
+ The success block is called once coreData is finished processing.
+ */
++(void)all:(DCModelBlock)success;
 
-//find an object of this table from coreData
-+(void)where:(id)search sort:(NSArray*)sortDescriptors limit:(NSInteger)limit finished:(DCModelBlock)callback;
+/**
+ Find an object of this table from coreData.
+ Pass a sort Descriptor if you want them sorted.
+ Pass limit to limit the amount of objects returned.
+ The success block is called once coreData is finished processing.
+ */
++(void)where:(id)search sort:(NSArray*)sortDescriptors limit:(NSInteger)limit success:(DCModelBlock)success;
 
-//find an object of this table from coreData
-+(void)where:(id)search sort:(NSArray*)sortDescriptors finished:(DCModelBlock)callback;
+/**
+ Find an object of this table from coreData.
+ Pass a sort Descriptor if you want them sorted.
+ The success block is called once coreData is finished processing.
+ */
++(void)where:(id)search sort:(NSArray*)sortDescriptors success:(DCModelBlock)success;
 
-//find an object of this table from coreData
-+(void)where:(id)search finished:(DCModelBlock)callback;
+/**
+ Find an object of this table from coreData.
+ The success block is called once coreData is finished processing.
+ */
++(void)where:(id)search success:(DCModelBlock)success;
 
-//does a batch save of all the objects.
-+(void)saveObjects:(NSArray*)objects;
+/**
+ Does a batch save of all the objects. This saves/clears the object context so all changes staged for coreData are commited/saved.
+ The success block is called once coreData is finished processing.
+ The failure block is called if an error is encountered.
+ */
++(void)saveObjects:(NSArray*)objects success:(DCModelBlock)success failure:(DCModelFailureBlock)failure;
 
-//saves an object
-+(void)saveObject:(NSManagedObject*)object;
+/**
+ Saves a single object. This saves/clears the object context so all changes staged for coreData are commited/saved.
+ The success block is called once coreData is finished processing.
+ The failure block is called if an error is encountered.
+ */
++(void)saveObject:(NSManagedObject*)object success:(DCModelBlock)success failure:(DCModelFailureBlock)failure;
 
-//delete an object
-+(void)destroyObject:(NSManagedObject*)object;
+/**
+ Does a batch update and saves any objects that aren't in coreData. This saves/clears the object context so all changes staged for coreData are commited/saved.
+ The success block is called once coreData is finished processing.
+ The failure block is called if an error is encountered.
+ */
++(void)updateObjects:(NSArray*)objects success:(DCModelBlock)success failure:(DCModelFailureBlock)failure;
 
-//delete a group of objects
-+(void)destroyObjects:(NSArray*)objects;
+/**
+ Does an update or save on a single object. This saves/clears the object context so all changes staged for coreData are commited/saved.
+ The success block is called once coreData is finished processing.
+ The failure block is called if an error is encountered.
+ */
++(void)updateObject:(id)object success:(DCModelBlock)success failure:(DCModelFailureBlock)failure;
 
-//creates a new object and saves it to disk
+/**
+ Does a delete on the single object. This saves/clears the object context so all changes staged for coreData are commited/saved.
+ The success block is called once coreData is finished processing.
+ The failure block is called if an error is encountered.
+ */
++(void)destroyObject:(NSManagedObject*)object success:(DCModelFailDestroy)success failure:(DCModelFailureBlock)failure;
+
+/**
+ Does a batch delete of the objects. This saves/clears the object context so all changes staged for coreData are commited/saved.
+ The success block is called once coreData is finished processing.
+ The failure block is called if an error is encountered.
+ */
++(void)destroyObjects:(NSArray*)objects success:(DCModelFailDestroy)success failure:(DCModelFailureBlock)failure;
+
+/**
+Creates a new object and adds it to the managed context. This saves/clears the object context so all changes staged for coreData are commited/saved.
+ */
 +(id)create:(NSDictionary*)dict;
 
-//creates a new object, but does NOT save it disk. You need to save it manually.
+/**
+ Creates a new object, but does add it to managed context. You need to save it manually by calling save.
+ */
 +(id)newObject;
 
-//creates a new object, but does NOT save it disk. You need to save it manually.
+/**
+ Creates a new object, but does add it to managed context. You need to save it manually by calling save.
+ Dict is a NSDictionary of values you want to assign to properties you have.
+ */
 +(id)newObject:(NSDictionary*)dict;
 
-//unrecommend sync methods. These are NOT thread safe.
+///-------------------------------
+/// @name Synchronous and NOT Thread Safe Methods
+///-------------------------------
 
-//pulls all the objects of this table from the coreData
+/**
+ Returns all the objects of this table from the coreData.
+ */
 +(NSArray*)all;
 
-//pulls all the objects of this table from the coreData
+/**
+ Returns all the objects of this table from the coreData.
+ Pass a sort Descriptor if you want them sorted.
+ */
 +(NSArray*)allSorted:(NSArray*)sortDescriptors;
 
-//find an object of this table from coreData
+/**
+ Find an object of this table from coreData and return it.
+ Pass a sort Descriptor if you want them sorted.
+ */
 +(NSArray*)where:(id)search sort:(NSArray*)sortDescriptors;
 
+/**
+ Find an object of this table from coreData and return it.
+ */
 +(NSArray*)where:(id)search;
 
+/**
+ Find an object of this table from coreData and return it.
+ Pass a sort Descriptor if you want them sorted.
+ Pass limit to limit the amount of objects returned.
+ */
 +(NSArray*)where:(id)search sort:(NSArray*)sortDescriptors limit:(NSInteger)limit;
 
-//destorys the objects in the array
+/**
+ Deletes the objects and returns if it was successful or not.
+ */
 +(BOOL)syncDeleteObjects:(NSArray*)objects;
 
-//returns the entityName of the coreData entity. By Default it returns the className.
-//override this in your subclass if you have a different name.
+/**
+ Returns the entityName of the coreData entity. By Default it returns the className.
+ */
 +(NSString*)entityName;
 
-//use to clear a all contents of a DB from disk. 
+//use to clear a all contents of a DB from disk.
+/**
+ This deletes all the content of the SQLLite store.
+ */
 +(void)clearDiskStorage;
 
-//use this to stop all async DB operations
+/**
+ This stops all the operations in the queue.
+ */
 +(void)stopOperations;
 
-//block the current thread until all opts complete
+/**
+ Blocks the current thread until all operations complete
+ */
 +(void)wait;
 
 @end
