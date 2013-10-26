@@ -71,7 +71,7 @@ typedef void (^DiskCallBack)(void);
     [self where:nil sort:nil limit:0 success:success];
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-+(void)where:(id)search finished:(DCModelBlock)success
++(void)where:(id)search success:(DCModelBlock)success
 {
     [self where:search sort:nil limit:0 success:success];
 }
@@ -91,13 +91,16 @@ typedef void (^DiskCallBack)(void);
     }];
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-+(void)saveObjects:(NSArray *)objects isUpdate:(BOOL)isUp success:(DCModelBlock)success failure:(DCModelFailureBlock)failure
++(void)saveObjects:(NSArray *)objects isUpdate:(BOOL)isUp isSingle:(BOOL)isSingle success:(DCModelBlock)success failure:(DCModelFailureBlock)failure
 {
     [self addDiskOperation:^{
+        NSMutableArray* collect = [NSMutableArray arrayWithCapacity:objects.count];
         for(NSManagedObject* object in objects)
         {
-            if(![object isDuplicate:[object class] isUpdate:isUp] && [object isKindOfClass:[NSManagedObject class]])
+            id updateObj = object;
+            if(![object isDuplicate:[object class] isUpdate:isUp upObj:&updateObj] && [object isKindOfClass:[NSManagedObject class]])
                 [[self objectCtx] insertObject:object];
+            [collect addObject:updateObj];
         }
         NSError* error = nil;
         if(![[self objectCtx] save:&error])
@@ -108,31 +111,34 @@ typedef void (^DiskCallBack)(void);
             return;
         }
         dispatch_sync(dispatch_get_main_queue(), ^{
-            success(objects);
+            if(isSingle)
+                success(collect[0]);
+            else
+                success(collect);
         });
     }];
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)saveObjects:(NSArray*)objects success:(DCModelBlock)success failure:(DCModelFailureBlock)failure
 {
-    [self saveObjects:objects isUpdate:NO success:success failure:failure];
+    [self saveObjects:objects isUpdate:NO isSingle:NO success:success failure:failure];
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)saveObject:(NSManagedObject*)object success:(DCModelBlock)success failure:(DCModelFailureBlock)failure
 {
     if(object && [object isKindOfClass:[NSManagedObject class]])
-        [self saveObjects:@[object] isUpdate:NO success:success failure:failure];
+        [self saveObjects:@[object] isUpdate:NO isSingle:YES success:success failure:failure];
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)updateObjects:(NSArray*)objects success:(DCModelBlock)success failure:(DCModelFailureBlock)failure
 {
-    [self saveObjects:objects isUpdate:YES success:success failure:failure];
+    [self saveObjects:objects isUpdate:YES isSingle:NO success:success failure:failure];
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)updateObject:(id)object success:(DCModelBlock)success failure:(DCModelFailureBlock)failure
 {
     if(object && [object isKindOfClass:[NSManagedObject class]])
-        [self saveObjects:@[object] isUpdate:YES success:success failure:failure];
+        [self saveObjects:@[object] isUpdate:YES isSingle:YES success:success failure:failure];
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)destroyObject:(NSManagedObject*)object success:(DCModelFailDestroy)success failure:(DCModelFailureBlock)failure
@@ -421,7 +427,7 @@ typedef void (^DiskCallBack)(void);
     return gather;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
--(BOOL)isDuplicate:(Class)class isUpdate:(BOOL)isUp
+-(BOOL)isDuplicate:(Class)class isUpdate:(BOOL)isUp upObj:(id*)upObj
 {
     BOOL isDup = NO;
     NSString* key = [class primaryKey];
@@ -436,6 +442,7 @@ typedef void (^DiskCallBack)(void);
                 NSArray* props = [object getPropertiesOfClass:class];
                 for(NSString* propertyName in props)
                     [object setValue:[self valueForKey:propertyName] forKey:propertyName];
+                *upObj = object;
             }
             isDup = YES;
         }
