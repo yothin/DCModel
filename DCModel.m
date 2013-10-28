@@ -98,7 +98,7 @@ typedef void (^DiskCallBack)(void);
         for(NSManagedObject* object in objects)
         {
             id updateObj = object;
-            if(![object isDuplicate:[object class] isUpdate:isUp upObj:&updateObj] && [object isKindOfClass:[NSManagedObject class]])
+            if(![object isDuplicate:[self class] isUpdate:isUp upObj:&updateObj] && [object isKindOfClass:[NSManagedObject class]])
                 [[self objectCtx] insertObject:object];
             [collect addObject:updateObj];
         }
@@ -208,15 +208,20 @@ typedef void (^DiskCallBack)(void);
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 +(NSArray*)where:(id)search sort:(NSArray*)sortDescriptors limit:(NSInteger)limit
 {
-    NSEntityDescription *entity = [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self objectCtx]];
-    NSFetchRequest *request = [[NSFetchRequest alloc] init];
-    [request setEntity:entity];
-    
-    [request setSortDescriptors:sortDescriptors];
-    request.predicate = [self processSearch:search];
-    if(limit > 0)
-        [request setFetchLimit:limit];
-    return [[self objectCtx] executeFetchRequest:request error:nil];
+    NSString* name = [self entityName];
+    if(name)
+    {
+        NSEntityDescription *entity = [NSEntityDescription entityForName:name inManagedObjectContext:[self objectCtx]];
+        NSFetchRequest *request = [[NSFetchRequest alloc] init];
+        [request setEntity:entity];
+        
+        [request setSortDescriptors:sortDescriptors];
+        request.predicate = [self processSearch:search];
+        if(limit > 0)
+            [request setFetchLimit:limit];
+        return [[self objectCtx] executeFetchRequest:request error:nil];
+    }
+    return nil;
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 +(BOOL)syncDeleteObjects:(NSArray*)objects
@@ -439,7 +444,7 @@ typedef void (^DiskCallBack)(void);
             if(isUp)
             {
                 id object = items[0];
-                NSArray* props = [object getPropertiesOfClass:class];
+                NSArray* props = [[self class] getPropertiesOfClass:class];
                 for(NSString* propertyName in props)
                     [object setValue:[self valueForKey:propertyName] forKey:propertyName];
                 *upObj = object;
