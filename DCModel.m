@@ -40,17 +40,20 @@ typedef void (^DiskCallBack)(void);
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 -(void)destroy:(DCModelFailDestroy)success failure:(DCModelFailureBlock)failure
 {
-    [NSManagedObject destroyObject:self success:success failure:failure];
+    Class class = NSClassFromString(self.entity.name);
+    [class destroyObject:self success:success failure:failure];
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 -(void)save:(DCModelBlock)success failure:(DCModelFailureBlock)failure
 {
-    [NSManagedObject saveObject:self success:success failure:failure];
+    Class class = NSClassFromString(self.entity.name);
+    [class saveObject:self success:success failure:failure];
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 -(void)saveOrUpdate:(DCModelBlock)success failure:(DCModelFailureBlock)failure
 {
-    [NSManagedObject updateObject:self success:success failure:failure];
+    Class class = NSClassFromString(self.entity.name);
+    [class updateObject:self success:success failure:failure];
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 +(NSString*)primaryKey
@@ -100,6 +103,7 @@ typedef void (^DiskCallBack)(void);
             id updateObj = object;
             if(![object isDuplicate:[self class] isUpdate:isUp upObj:&updateObj] && [object isKindOfClass:[NSManagedObject class]])
                 [[self objectCtx] insertObject:object];
+
             [collect addObject:updateObj];
         }
         NSError* error = nil;
