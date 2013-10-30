@@ -1,41 +1,73 @@
-# DCModel #
+DCModel
+=======
 
-DCModel is an abstraction of core data APIs. It borrows from active record syntax to make core data interaction fun and easy. It also has network methods that automatically parses JSON data into core data objects. If that was not enough, it also adds primary key validation to your objects to avoid duplicates. I know, your brain just exploded. To the examples!
+DCModel is an lightweight and simple abstraction of core data APIs and fully asynchronous for both iOS and Mac OSX. It borrows from active record (Ruby on Rails, anyone!?) syntax to make core data interaction fun and easy. It also adds primary key validation to your objects to avoid duplicates. I know, your brain just exploded. To the examples!
 
 # Examples #
 First we create a subclass of NSManagedObject as usual, but we also import DCModel.
 
+```objective-c
 	#import "DCModel.h"
 
-	@interface TweetModel : NSManagedObject
+	@interface User : NSManagedObject
 
-	//these both match the values in coreData xcdatamodeld file and the json value name
-	@property(nonatomic,strong)NSString* text; 
-	@property(nonatomic,strong)NSString* id_str;
+	@property(nonatomic,copy)NSString *name;
+	@property(nonatomic,copy)NSString *firstName;
+	@property(nonatomic,copy)NSString *lastName;
+	@property(nonatomic,strong)NSNumber *age;
+	@property(nonatomic,strong)NSNumber *employed;
 
 	@end
+```
+Next for the commands:
+### Create/Save ###
+Create an new object and save it
 
-Boom! That is it. Now the magic begins.
+```objective-c
+User *john = [User newObject];
+john.name = @"John";
+john.firstName = @"John";
+john.lastName = @"Doe";
+john.age = @22;
+[john saveOrUpdate:^(id item){
+    NSLog(@"successfully saved %@",[item name]);
+}failure:^(NSError* error){
+    NSLog(@"got an error, that is no good: %@",[error localizedDescription]);
+}];
+```
 
-	[TweetModel getAll:@"https://api.twitter.com/1/statuses/user_timeline.json?include_entities=true&include_rts=true&screen_name=twitterapi&count=2" finished:^(id items){
-	    [TweetModel saveObjects:items]; //objects are now saved to coreData.
-	    [TweetModel all:^(id items){ //pulls all the items from coreData asynchronously 
-	        for(TweetModel* item in items)
-	            NSLog(@"coreData item text: %@ id_str: %@",item.text,item.id_str);
-	    }];
-	}];
+### Find/Delete ###
+find and delete all the johns
 
-With just 5 lines of code, we converted JSON data to coreData objects, saved them, and pulled them from coreData completely asynchronously.
+```objective-c
+[User where:@"name == John" success:^(id items){
+	[User destroyObjects:items success:^{
+		NSLog(@"deleted all the John's!");
+	}failure:^(NSError* error){
+		NSLog(@"got an error, that is no good: %@",[error localizedDescription]);
+}];
+```
+### find/fetch ###
+There are several search methods to make finding what you need 
+
+```objective-c 
+[User all:^(NSArray *items){ 
+    for(User* user in items)
+        NSLog(@"User name: %@ age: %@",user.name,user.age);
+}];
+```
+
+It is important that we did all of this completely asynchronously and thread safe. No more headache of trying to manage a coreData object context from the a background thread and made sure your not deadlocking in the process with a clean syntax. You just get to focus on making an awesome app.
 	
 # Primary Key Validation #
 
 Ok, so now I am sure you want to know about the Primary key validation I mentioned. Well here it is:
 	
-	//add this to your implemention file of your NSManagedObject subclass (TwitterModel.m in our example)
+	//add this to your implemention file of your NSManagedObject subclass (User.m in our example)
 	//return the property name of the key you want to be primary.
 	+(NSString*)primaryKey
 	{
-	    return @"id_str";
+	    return @"name";
 	}
 Done. Now anytime you save an object, it will validate to ensure that the object does not exist before adding it in. 
 
