@@ -25,6 +25,11 @@ typedef void (^DiskCallBack)(void);
     return [self newObject:nil];
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
++(id)newModel
+{
+    return [self newObject:nil];
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////
 +(id)newObject:(NSDictionary*)dict
 {
     NSEntityDescription *entity = [NSEntityDescription entityForName:[self entityName] inManagedObjectContext:[self objectCtx]];
