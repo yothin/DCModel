@@ -144,6 +144,11 @@ Creates a new object and adds it to the managed context. This saves/clears the o
 +(id)newObject;
 
 /**
+ Does the same thing as newObject, but is needed for certain runtime init on different libraries.
+ */
++(id)newModel;
+
+/**
  Creates a new object, but does add it to managed context. You need to save it manually by calling save.
  Dict is a NSDictionary of values you want to assign to properties you have.
  */
