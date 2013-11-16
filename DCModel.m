@@ -88,9 +88,12 @@ typedef void (^DiskCallBack)(void);
 {
     [self addDiskOperation:^{
         NSArray* items = [self where:search sort:sortDescriptors limit:limit];
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            success(items);
-        });
+        if(success)
+        {
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                success(items);
+            });
+        }
     }];
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -109,17 +112,23 @@ typedef void (^DiskCallBack)(void);
         NSError* error = nil;
         if(![[self objectCtx] save:&error])
         {
-            dispatch_sync(dispatch_get_main_queue(), ^{
-                failure(error);
-            });
+            if(failure)
+            {
+                dispatch_sync(dispatch_get_main_queue(), ^{
+                    failure(error);
+                });
+            }
             return;
         }
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            if(isSingle)
-                success(collect[0]);
-            else
-                success(collect);
-        });
+        if(success)
+        {
+            dispatch_sync(dispatch_get_main_queue(), ^{
+                if(isSingle)
+                    success(collect[0]);
+                else
+                    success(collect);
+            });
+        }
     }];
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -170,12 +179,14 @@ typedef void (^DiskCallBack)(void);
             if(![[self objectCtx] save:&error])
             {
                 dispatch_sync(dispatch_get_main_queue(), ^{
-                    failure(error);
+                    if(failure)
+                        failure(error);
                 });
                 return;
             }
             dispatch_sync(dispatch_get_main_queue(), ^{
-                success();
+                if(success)
+                    success();
             });
         }];
     }
