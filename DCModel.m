@@ -388,7 +388,7 @@ typedef void (^DiskCallBack)(void);
     {
         NSMutableString* queryString = [NSMutableString new];
         int i = 0;
-        int count = [search count];
+        NSInteger count = [search count];
         for(id key in search)
         {
             [queryString appendFormat:@"%@ == %@", key, [search valueForKey:key]];
