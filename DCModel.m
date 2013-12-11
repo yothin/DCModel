@@ -387,8 +387,8 @@ typedef void (^DiskCallBack)(void);
     else if([search isKindOfClass:[NSDictionary class]])
     {
         NSMutableString* queryString = [NSMutableString new];
-        int i = 0;
-        NSInteger count = [search count];
+        NSUInteger i = 0;
+        NSUInteger count = [search count];
         for(id key in search)
         {
             [queryString appendFormat:@"%@ == %@", key, [search valueForKey:key]];
