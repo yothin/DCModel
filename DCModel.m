@@ -92,7 +92,9 @@ typedef void (^DiskCallBack)(void);
 +(void)where:(id)search sort:(NSArray*)sortDescriptors limit:(NSInteger)limit success:(DCModelBlock)success
 {
     [self addDiskOperation:^{
+        [[self objectCtx] lock];
         NSArray* items = [self where:search sort:sortDescriptors limit:limit];
+        [[self objectCtx] unlock];
         if(success)
         {
             dispatch_sync(dispatch_get_main_queue(), ^{
@@ -106,6 +108,7 @@ typedef void (^DiskCallBack)(void);
 {
     [self addDiskOperation:^{
         NSMutableArray* collect = [NSMutableArray arrayWithCapacity:objects.count];
+        [[self objectCtx] lock];
         for(NSManagedObject* object in objects)
         {
             id updateObj = object;
@@ -117,6 +120,7 @@ typedef void (^DiskCallBack)(void);
         NSError* error = nil;
         if(![[self objectCtx] save:&error])
         {
+            [[self objectCtx] unlock];
             if(failure)
             {
                 dispatch_sync(dispatch_get_main_queue(), ^{
@@ -125,6 +129,7 @@ typedef void (^DiskCallBack)(void);
             }
             return;
         }
+        [[self objectCtx] unlock];
         if(success)
         {
             dispatch_sync(dispatch_get_main_queue(), ^{
@@ -170,6 +175,7 @@ typedef void (^DiskCallBack)(void);
     if(objects)
     {
         [self addDiskOperation:^{
+            [[self objectCtx] lock];
             for(NSManagedObject* object in objects)
             {
                 if([object isKindOfClass:[NSManagedObject class]])
@@ -183,12 +189,14 @@ typedef void (^DiskCallBack)(void);
             NSError* error = nil;
             if(![[self objectCtx] save:&error])
             {
+                [[self objectCtx] unlock];
                 dispatch_sync(dispatch_get_main_queue(), ^{
                     if(failure)
                         failure(error);
                 });
                 return;
             }
+            [[self objectCtx] unlock];
             dispatch_sync(dispatch_get_main_queue(), ^{
                 if(success)
                     success();
@@ -364,7 +372,7 @@ typedef void (^DiskCallBack)(void);
         diskQueue = [[NSOperationQueue alloc] init];
         diskQueue.maxConcurrentOperationCount = 1;
     }
-    [diskQueue addOperationWithBlock:callback];
+    [diskQueue performSelectorOnMainThread:@selector(addOperationWithBlock:) withObject:callback waitUntilDone:NO];
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 +(NSString*)getClassName:(Class)objectClass
