@@ -29,22 +29,22 @@ typedef id (^DCModelParseBlock)(id jsonObj);
 
 /**
  Runs the class method DestoryObject with self as the object
- The success block is called once coreData is finished processing.
- The failure block is called if an error is encountered.
+ @param The success block is called once coreData is finished processing.
+ @param The failure block is called if an error is encountered.
  */
 -(void)destroy:(DCModelFailDestroy)success failure:(DCModelFailureBlock)failure;
 
 /**
  Runs the class method save with self as the object
- The success block is called once coreData is finished processing.
- The failure block is called if an error is encountered.
+ @param The success block is called once coreData is finished processing.
+ @param The failure block is called if an error is encountered.
  */
 -(void)save:(DCModelBlock)success failure:(DCModelFailureBlock)failure;
 
 /**
  Runs the class method saveOrUpdate with self as the object
- The success block is called once coreData is finished processing.
- The failure block is called if an error is encountered.
+ @param The success block is called once coreData is finished processing.
+ @param The failure block is called if an error is encountered.
  */
 -(void)saveOrUpdate:(DCModelBlock)success failure:(DCModelFailureBlock)failure;
 
@@ -60,62 +60,74 @@ typedef id (^DCModelParseBlock)(id jsonObj);
 
 /**
  Fetchs all the objects of this table from the coreData. Pass a sort Descriptor if you want them sorted
- The success block is called once coreData is finished processing.
+ @param The success block is called once coreData is finished processing.
  */
 +(void)all:(NSArray*)sortDescriptors success:(DCModelBlock)success;
 
 /**
  Fetchs all the objects of this table from the coreData.
- The success block is called once coreData is finished processing.
+ @param The success block is called once coreData is finished processing.
  */
 +(void)all:(DCModelBlock)success;
 
 /**
  Find an object of this table from coreData.
- Pass a sort Descriptor if you want them sorted.
- Pass limit to limit the amount of objects returned.
- The success block is called once coreData is finished processing.
+ @param Pass a sort Descriptor if you want them sorted.
+ @param Pass limit to limit the amount of objects returned.
+ @param The success block is called once coreData is finished processing.
  */
 +(void)where:(id)search sort:(NSArray*)sortDescriptors limit:(NSInteger)limit success:(DCModelBlock)success;
 
 /**
  Find an object of this table from coreData.
- Pass a sort Descriptor if you want them sorted.
- The success block is called once coreData is finished processing.
+ @param Pass a sort Descriptor if you want them sorted.
+ @param The success block is called once coreData is finished processing.
  */
 +(void)where:(id)search sort:(NSArray*)sortDescriptors success:(DCModelBlock)success;
 
 /**
  Find an object of this table from coreData.
- The success block is called once coreData is finished processing.
+ @param search if the search string or predicate to find
+ @param The success block is called once coreData is finished processing.
  */
 +(void)where:(id)search success:(DCModelBlock)success;
 
 /**
  Does a batch save of all the objects. This saves/clears the object context so all changes staged for coreData are commited/saved.
- The success block is called once coreData is finished processing.
- The failure block is called if an error is encountered.
+ @param The success block is called once coreData is finished processing.
+ @param The failure block is called if an error is encountered.
  */
 +(void)saveObjects:(NSArray*)objects success:(DCModelBlock)success failure:(DCModelFailureBlock)failure;
 
 /**
  Saves a single object. This saves/clears the object context so all changes staged for coreData are commited/saved.
- The success block is called once coreData is finished processing.
- The failure block is called if an error is encountered.
+ @param The success block is called once coreData is finished processing.
+ @param The failure block is called if an error is encountered.
  */
 +(void)saveObject:(NSManagedObject*)object success:(DCModelBlock)success failure:(DCModelFailureBlock)failure;
 
 /**
  Does a batch update and saves any objects that aren't in coreData. This saves/clears the object context so all changes staged for coreData are commited/saved.
- The success block is called once coreData is finished processing.
- The failure block is called if an error is encountered.
+ @param objects are the multiple objects to update.
+ @param The success block is called once coreData is finished processing.
+ @param The failure block is called if an error is encountered.
  */
 +(void)updateObjects:(NSArray*)objects success:(DCModelBlock)success failure:(DCModelFailureBlock)failure;
 
 /**
+ Does a batch update and saves any objects that aren't in coreData. This saves/clears the object context so all changes staged for coreData are commited/saved.
+ @param objects are the multiple objects to update.
+ @param keys is the properties you want to update
+ @param The success block is called once coreData is finished processing.
+ @param The failure block is called if an error is encountered.
+ */
++(void)updateObjects:(NSArray*)objects properties:(NSArray*)keys success:(DCModelBlock)success failure:(DCModelFailureBlock)failure;
+
+/**
  Does an update or save on a single object. This saves/clears the object context so all changes staged for coreData are commited/saved.
- The success block is called once coreData is finished processing.
- The failure block is called if an error is encountered.
+ @param object is the object to update.
+ @param The success block is called once coreData is finished processing.
+ @param The failure block is called if an error is encountered.
  */
 +(void)updateObject:(id)object success:(DCModelBlock)success failure:(DCModelFailureBlock)failure;
 
