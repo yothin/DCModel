@@ -48,6 +48,14 @@ typedef id (^DCModelParseBlock)(id jsonObj);
  */
 -(void)saveOrUpdate:(DCModelBlock)success failure:(DCModelFailureBlock)failure;
 
+/**
+ Runs the class method saveOrUpdate with self as the object
+ @param The success block is called once coreData is finished processing.
+ @param keys is the properties you want to update
+ @param The failure block is called if an error is encountered.
+ */
+-(void)saveOrUpdate:(DCModelBlock)success properties:(NSArray*)keys failure:(DCModelFailureBlock)failure;
+
 ///-------------------------------
 /// @name Asynchronous and Thread Safe Methods
 ///-------------------------------
@@ -130,6 +138,15 @@ typedef id (^DCModelParseBlock)(id jsonObj);
  @param The failure block is called if an error is encountered.
  */
 +(void)updateObject:(id)object success:(DCModelBlock)success failure:(DCModelFailureBlock)failure;
+
+/**
+ Does an update or save on a single object. This saves/clears the object context so all changes staged for coreData are commited/saved.
+ @param object is the object to update.
+ @param keys is the properties you want to update
+ @param The success block is called once coreData is finished processing.
+ @param The failure block is called if an error is encountered.
+ */
++(void)updateObject:(id)object properties:(NSArray*)keys success:(DCModelBlock)success failure:(DCModelFailureBlock)failure;
 
 /**
  Does a delete on the single object. This saves/clears the object context so all changes staged for coreData are commited/saved.

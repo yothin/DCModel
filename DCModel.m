@@ -57,8 +57,13 @@ typedef void (^DiskCallBack)(void);
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 -(void)saveOrUpdate:(DCModelBlock)success failure:(DCModelFailureBlock)failure
 {
+    [self saveOrUpdate:success properties:nil failure:failure];
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////
+-(void)saveOrUpdate:(DCModelBlock)success properties:(NSArray*)keys failure:(DCModelFailureBlock)failure
+{
     Class class = NSClassFromString(self.entity.name);
-    [class updateObject:self success:success failure:failure];
+    [class updateObject:self properties:keys success:success failure:failure];
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 +(NSString*)primaryKey
@@ -165,8 +170,13 @@ typedef void (^DiskCallBack)(void);
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)updateObject:(id)object success:(DCModelBlock)success failure:(DCModelFailureBlock)failure
 {
+    [self updateObject:object properties:nil success:success failure:failure];
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////
++(void)updateObject:(id)object properties:(NSArray*)keys success:(DCModelBlock)success failure:(DCModelFailureBlock)failure
+{
     if(object && [object isKindOfClass:[NSManagedObject class]])
-        [self saveObjects:@[object] isUpdate:YES isSingle:YES keys:nil success:success failure:failure];
+        [self saveObjects:@[object] isUpdate:YES isSingle:YES keys:keys success:success failure:failure];
 }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 +(void)destroyObject:(NSManagedObject*)object success:(DCModelFailDestroy)success failure:(DCModelFailureBlock)failure
